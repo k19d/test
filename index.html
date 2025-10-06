@@ -58,7 +58,7 @@
         body {
             background: 
                 linear-gradient(135deg, rgba(10, 10, 22, 0.85) 0%, rgba(5, 5, 16, 0.9) 100%),
-                url('SANTA.png');
+                url('https://images.unsplash.com/photo-1519681393784-d120267933ba?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80');
             background-blend-mode: overlay;
             background-size: cover, cover;
             background-position: center, center;
@@ -194,7 +194,7 @@
         .logo-image {
             width: 180px;
             height: 70px;
-            background: url('GH0ST.png') center/contain no-repeat;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             border-radius: var(--border-radius);
             display: flex;
             align-items: center;
@@ -283,6 +283,7 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            cursor: pointer;
         }
 
         .nav-link::before {
@@ -359,6 +360,9 @@
             border-radius: 0 var(--border-radius) var(--border-radius) 0;
             padding: 0 1.5rem;
             background: linear-gradient(45deg, var(--primary), var(--primary-dark));
+            border: none;
+            color: white;
+            cursor: pointer;
         }
 
         .btn {
@@ -466,6 +470,11 @@
             font-weight: bold;
             box-shadow: 0 2px 10px rgba(255, 215, 0, 0.5);
             animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
         }
 
         .auth-section {
@@ -1043,6 +1052,7 @@
             border-radius: var(--border-radius);
             transition: var(--transition);
             border: 1px solid transparent;
+            cursor: pointer;
         }
 
         .sidebar-nav a:hover, .sidebar-nav a.active {
@@ -1663,6 +1673,7 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            cursor: pointer;
         }
 
         .footer-links a:hover {
@@ -1947,7 +1958,9 @@
         <!-- Header -->
         <header class="header" id="mainHeader">
             <div class="logo-container">
-                <div class="logo-image"></div>
+                <div class="logo-image">
+                    <i class="fas fa-ghost"></i>
+                </div>
                 <div class="logo-text">GH0ST</div>
             </div>
             
@@ -2041,11 +2054,11 @@
                     </div>
                     
                     <div class="hero-actions">
-                        <button class="btn btn-primary btn-lg">
+                        <button class="btn btn-primary btn-lg" id="startShoppingBtn">
                             <i class="fas fa-rocket"></i>
                             ابدأ التسوق الآن
                         </button>
-                        <button class="btn btn-secondary btn-lg">
+                        <button class="btn btn-secondary btn-lg" id="demoBtn">
                             <i class="fas fa-play-circle"></i>
                             شاهد العرض التوضيحي
                         </button>
@@ -2058,11 +2071,11 @@
                 <div class="section-header">
                     <h2 class="section-title">المنتجات المميزة</h2>
                     <div class="section-controls">
-                        <button class="btn btn-secondary">
+                        <button class="btn btn-secondary" id="filterBtn">
                             <i class="fas fa-filter"></i>
                             تصفية
                         </button>
-                        <button class="btn btn-secondary">
+                        <button class="btn btn-secondary" id="sortBtn">
                             <i class="fas fa-sort"></i>
                             ترتيب
                         </button>
@@ -2087,7 +2100,7 @@
                 <div class="section-header">
                     <h2 class="section-title">أحدث المنتجات</h2>
                     <div class="section-controls">
-                        <button class="btn btn-primary">
+                        <button class="btn btn-primary" id="viewAllBtn">
                             <i class="fas fa-arrow-left"></i>
                             مشاهدة الكل
                         </button>
@@ -2627,6 +2640,54 @@
 
             // Search functionality
             document.getElementById('searchInput').addEventListener('input', handleSearch);
+
+            // Hero buttons
+            document.getElementById('startShoppingBtn').addEventListener('click', () => {
+                document.getElementById('productsSection').scrollIntoView({ behavior: 'smooth' });
+            });
+
+            document.getElementById('demoBtn').addEventListener('click', () => {
+                showNotification('جارٍ تحميل العرض التوضيحي...', 'info');
+            });
+
+            // Section controls
+            document.getElementById('filterBtn').addEventListener('click', () => {
+                showNotification('فتح خيارات التصفية', 'info');
+            });
+
+            document.getElementById('sortBtn').addEventListener('click', () => {
+                showNotification('فتح خيارات الترتيب', 'info');
+            });
+
+            document.getElementById('viewAllBtn').addEventListener('click', () => {
+                showNotification('عرض جميع المنتجات', 'info');
+            });
+
+            // Filter buttons
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    showNotification(`تم التصفية حسب: ${this.textContent}`, 'info');
+                });
+            });
+
+            // Footer links
+            document.querySelectorAll('.footer-links a').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    showNotification(`جارٍ الانتقال إلى: ${this.textContent}`, 'info');
+                });
+            });
+
+            // Social links
+            document.querySelectorAll('.social-links .btn-icon').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const platform = this.querySelector('i').className.split(' ')[1].split('-')[1];
+                    showNotification(`جارٍ فتح ${platform}`, 'info');
+                });
+            });
         }
 
         function setupScrollEffects() {
