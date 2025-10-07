@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>لوحة الإدارة</title>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; font-src 'self' https: data:; script-src 'self' https://www.gstatic.com https://www.googleapis.com; connect-src 'self' https://*.firebaseio.com https://*.googleapis.com https://*.gstatic.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com;">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body class="admin-body">
+    <header class="site-header">
+      <div class="container header-inner">
+        <a class="brand" href="./">
+          <img src="assets/logo.png" alt="Logo" class="brand-logo" />
+          <span class="brand-name">Panels Store - Admin</span>
+        </a>
+      </div>
+    </header>
+
+    <main class="container admin-container">
+      <section id="admin-login" class="card">
+        <h2>تسجيل الدخول للإدارة</h2>
+        <p class="muted">الدخول ببريد وكلمة مرور فقط.</p>
+        <form id="admin-login-form" class="form">
+          <label>البريد الإلكتروني</label>
+          <input id="admin-email" type="email" required />
+          <label>كلمة المرور</label>
+          <input id="admin-password" type="password" minlength="6" required />
+          <button id="btn-admin-login" type="submit" class="btn btn-primary">دخول</button>
+          <div id="admin-login-status" class="status"></div>
+        </form>
+      </section>
+
+      <section id="admin-app" class="hidden">
+        <div class="grid-2">
+          <div class="card">
+            <h3>إضافة منتج جديد</h3>
+            <form id="product-form" class="form">
+              <label>اسم المنتج</label>
+              <input id="product-name" required />
+              <label>السعر (بالعملة المحلية)</label>
+              <input id="product-price" type="number" min="0" step="0.01" required />
+              <label>رابط الصورة</label>
+              <input id="product-image" type="url" required />
+              <label>القسم</label>
+              <select id="product-category" required>
+                <option value="android">ANDROID</option>
+                <option value="pc">PC</option>
+                <option value="ios">IOS</option>
+              </select>
+              <button id="btn-save-product" class="btn btn-primary" type="submit">حفظ المنتج</button>
+              <div id="product-status" class="status"></div>
+            </form>
+          </div>
+
+          <div class="card">
+            <h3>طلبات الدفع</h3>
+            <table class="table" id="orders-table">
+              <thead>
+                <tr>
+                  <th>التاريخ</th>
+                  <th>المستخدم</th>
+                  <th>المنتج</th>
+                  <th>الطريقة</th>
+                  <th>المرسل</th>
+                  <th>التواصل</th>
+                  <th>المبلغ</th>
+                  <th>الحالة</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore-compat.js"></script>
+
+    <script src="js/firebase.js"></script>
+    <script src="js/admin.js"></script>
+  </body>
+</html>

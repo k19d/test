@@ -1,772 +1,151 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>👻 GH0ST STORE - المتجر الرقمي الأكثر تطوراً</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
-    <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-storage.js"></script>
-    <style>
-        :root {
-            --primary: #ff4655;
-            --primary-dark: #ff0015;
-            --primary-light: #ff6b7a;
-            --secondary: #00f0ff;
-            --secondary-dark: #00b8c4;
-            --accent: #ffd900;
-            --accent-dark: #e6c400;
-            --dark: #0a0a16;
-            --darker: #050510;
-            --dark-light: #1a1a2e;
-            --light: #f0f0f0;
-            --light-dark: #e0e0e0;
-            --gray: #333;
-            --gray-light: #555;
-            --success: #00ff88;
-            --warning: #ffaa00;
-            --error: #ff4444;
-            
-            --transition: all 0.3s ease;
-            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            --border-radius: 12px;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            background: var(--dark);
-            color: var(--light);
-            font-family: 'Cairo', sans-serif;
-            overflow-x: hidden;
-        }
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem 2rem;
-            background: rgba(10, 10, 22, 0.95);
-            border-bottom: 1px solid var(--primary);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-
-        .logo-container {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .logo-image {
-            width: 50px;
-            height: 50px;
-            background: var(--primary);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            color: white;
-        }
-
-        .nav {
-            display: flex;
-            gap: 1rem;
-        }
-
-        .nav-link {
-            color: var(--light);
-            text-decoration: none;
-            padding: 0.5rem 1rem;
-            border-radius: var(--border-radius);
-            transition: var(--transition);
-        }
-
-        .nav-link:hover {
-            background: var(--primary);
-        }
-
-        .btn {
-            padding: 0.7rem 1.5rem;
-            border: none;
-            border-radius: var(--border-radius);
-            cursor: pointer;
-            transition: var(--transition);
-            font-weight: 600;
-        }
-
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-        }
-
-        .btn-secondary {
-            background: transparent;
-            border: 1px solid var(--primary);
-            color: var(--primary);
-        }
-
-        .main {
-            padding: 2rem;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .hero {
-            text-align: center;
-            padding: 4rem 0;
-        }
-
-        .hero h1 {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            color: var(--primary);
-        }
-
-        .products-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            margin: 2rem 0;
-        }
-
-        .product-card {
-            background: var(--dark-light);
-            padding: 1.5rem;
-            border-radius: var(--border-radius);
-            border: 1px solid var(--gray);
-        }
-
-        .product-image {
-            height: 100px;
-            background: var(--primary);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-            margin-bottom: 1rem;
-        }
-
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 1rem 1.5rem;
-            border-radius: var(--border-radius);
-            color: white;
-            z-index: 2000;
-            animation: slideIn 0.3s ease;
-        }
-
-        .notification.success {
-            background: var(--success);
-        }
-
-        .notification.error {
-            background: var(--error);
-        }
-
-        @keyframes slideIn {
-            from { transform: translateX(100%); }
-            to { transform: translateX(0); }
-        }
-
-        .auth-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 2000;
-        }
-
-        .auth-content {
-            background: var(--dark);
-            padding: 2rem;
-            border-radius: var(--border-radius);
-            width: 90%;
-            max-width: 400px;
-            border: 1px solid var(--primary);
-        }
-
-        .admin-container {
-            display: none;
-            min-height: 100vh;
-            background: var(--dark);
-        }
-
-        .admin-container.active {
-            display: block;
-        }
-
-        .sidebar {
-            width: 250px;
-            background: var(--darker);
-            padding: 2rem;
-            position: fixed;
-            height: 100vh;
-            border-left: 1px solid var(--primary);
-        }
-
-        .main-content {
-            margin-right: 250px;
-            padding: 2rem;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        .stat-card {
-            background: var(--dark-light);
-            padding: 1.5rem;
-            border-radius: var(--border-radius);
-            border: 1px solid var(--gray);
-        }
-
-        .earning-card {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            padding: 1.5rem;
-            border-radius: var(--border-radius);
-            color: white;
-            margin-bottom: 1rem;
-        }
-
-        .orders-list {
-            margin-top: 2rem;
-        }
-
-        .order-card {
-            background: var(--dark-light);
-            padding: 1.5rem;
-            border-radius: var(--border-radius);
-            margin-bottom: 1rem;
-            border: 1px solid var(--gray);
-        }
-
-        .order-actions {
-            display: flex;
-            gap: 0.5rem;
-            margin-top: 1rem;
-        }
-
-        .payment-methods {
-            display: flex;
-            gap: 1rem;
-            margin: 1rem 0;
-        }
-
-        .payment-method {
-            padding: 1rem;
-            border: 1px solid var(--gray);
-            border-radius: var(--border-radius);
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .payment-method.active {
-            border-color: var(--primary);
-            background: rgba(255, 70, 85, 0.1);
-        }
-
-        .hidden {
-            display: none !important;
-        }
-    </style>
-</head>
-<body>
-    <!-- Store Interface -->
-    <div id="storeInterface">
-        <header class="header">
-            <div class="logo-container">
-                <div class="logo-image">SANTA</div>
-                <h2>GH0ST STORE</h2>
-            </div>
-            
-            <nav class="nav">
-                <a href="#" class="nav-link active">الرئيسية</a>
-                <a href="#" class="nav-link">المنتجات</a>
-                <a href="#" class="nav-link">الباقات</a>
-            </nav>
-            
-            <div class="nav-actions">
-                <button class="btn btn-secondary" id="cartBtn">
-                    <i class="fas fa-shopping-cart"></i>
-                    السلة (<span id="cartCount">0</span>)
-                </button>
-                
-                <div class="auth-section">
-                    <div id="loginButtons">
-                        <button class="btn btn-primary" id="googleLoginBtn">
-                            <i class="fab fa-google"></i>
-                            الدخول بجوجل
-                        </button>
-                    </div>
-                    <div id="userMenu" class="hidden">
-                        <span id="userName"></span>
-                        <button class="btn btn-secondary" id="adminPanelBtn">
-                            <i class="fas fa-cog"></i>
-                        </button>
-                        <button class="btn btn-secondary" id="logoutBtn">
-                            <i class="fas fa-sign-out-alt"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </header>
-
-        <main class="main">
-            <section class="hero">
-                <h1>مرحباً بك في GH0ST STORE</h1>
-                <p>أفضل المنتجات الرقمية بأفضل الأسعار</p>
-                <button class="btn btn-primary">بدأ التسوق</button>
-            </section>
-
-            <section class="products-section">
-                <h2>المنتجات المميزة</h2>
-                <div class="products-grid" id="productsGrid">
-                    <!-- المنتجات تُحمّل ديناميكياً -->
-                </div>
-            </section>
-        </main>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>متجر البانلات والسكربتات</title>
+    <meta name="description" content="متجر احترافي لبيع البانلات والسكربتات لأنظمة ANDROID و PC و IOS.">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: https:; media-src 'self' https: data:; style-src 'self' 'unsafe-inline'; font-src 'self' https: data:; script-src 'self' https://www.gstatic.com https://www.googleapis.com; connect-src 'self' https://*.firebaseio.com https://*.googleapis.com https://*.gstatic.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com;">
+    <link rel="preconnect" href="https://www.gstatic.com">
+    <link rel="preconnect" href="https://www.googleapis.com">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <div class="video-bg">
+      <video id="bgVideo" autoplay muted loop playsinline>
+        <source src="assets/bg.mp4" type="video/mp4" />
+      </video>
+      <div class="video-overlay"></div>
     </div>
 
-    <!-- Admin Panel -->
-    <div id="adminInterface" class="admin-container">
-        <div class="sidebar">
-            <h3>لوحة التحكم</h3>
-            <nav>
-                <a href="#" data-section="dashboard">الإحصائيات</a>
-                <a href="#" data-section="products">المنتجات</a>
-                <a href="#" data-section="orders">الطلبات</a>
-                <a href="#" data-section="earnings">الأرباح</a>
-                <a href="#" id="backToStore">العودة للمتجر</a>
-            </nav>
+    <header class="site-header blur-on-scroll">
+      <div class="container header-inner">
+        <a class="brand" href="#">
+          <img src="assets/logo.png" alt="Logo" class="brand-logo" />
+          <span class="brand-name">Panels Store</span>
+        </a>
+        <nav class="main-nav">
+          <a href="#android">ANDROID</a>
+          <a href="#pc">PC</a>
+          <a href="#ios">IOS</a>
+        </nav>
+        <div class="auth-actions">
+          <button id="btn-open-auth" class="btn btn-ghost">تسجيل الدخول / إنشاء حساب</button>
+          <div id="user-info" class="user-info hidden">
+            <img id="user-avatar" class="avatar" alt="" />
+            <span id="user-name"></span>
+            <button id="btn-logout" class="btn btn-danger">تسجيل الخروج</button>
+          </div>
         </div>
+      </div>
+    </header>
 
-        <div class="main-content">
-            <!-- محتوى لوحة التحكم -->
-            <div id="adminContent">
-                <div data-admin-section="dashboard">
-                    <h2>لوحة التحكم</h2>
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <h3>إجمالي المنتجات</h3>
-                            <div class="value" id="totalProducts">0</div>
-                        </div>
-                        <div class="stat-card">
-                            <h3>الطلبات اليوم</h3>
-                            <div class="value" id="todayOrders">0</div>
-                        </div>
-                        <div class="stat-card">
-                            <h3>إجمالي المبيعات</h3>
-                            <div class="value" id="totalSales">$0</div>
-                        </div>
-                    </div>
-                </div>
+    <main>
+      <section class="hero center fade-in-on-view">
+        <div class="container hero-inner">
+          <img src="assets/logo-large.png" alt="Logo" class="hero-logo" />
+          <h1 class="hero-title">متجر البانلات والسكربتات</h1>
+          <p class="hero-subtitle">تجربة شراء سلسة، تصميم حديث، وأمان عالي</p>
+        </div>
+      </section>
 
-                <div data-admin-section="earnings" class="hidden">
-                    <h2>الإيرادات والأرباح</h2>
-                    <div class="earnings-dashboard">
-                        <div class="earning-card">
-                            <h3>أرباح اليوم</h3>
-                            <div class="value" id="todayEarnings">$0</div>
-                        </div>
-                        <div class="earning-card">
-                            <h3>أرباح الأسبوع</h3>
-                            <div class="value" id="weeklyEarnings">$0</div>
-                        </div>
-                        <div class="earning-card">
-                            <h3>أرباح الشهر</h3>
-                            <div class="value" id="monthlyEarnings">$0</div>
-                        </div>
-                        <div class="earning-card">
-                            <h3>إجمالي الأرباح</h3>
-                            <div class="value" id="totalEarnings">$0</div>
-                        </div>
-                    </div>
-                </div>
+        <section id="android" class="products-section fade-in-on-view">
+          <div class="container">
+            <h2>ANDROID</h2>
+            <div id="grid-android" class="products-grid"></div>
+          </div>
+        </section>
 
-                <div data-admin-section="orders" class="hidden">
-                    <h2>إدارة الطلبات</h2>
-                    <div class="orders-list" id="ordersList">
-                        <!-- الطلبات تُحمّل ديناميكياً -->
-                    </div>
-                </div>
+        <section id="pc" class="products-section fade-in-on-view">
+          <div class="container">
+            <h2>PC</h2>
+            <div id="grid-pc" class="products-grid"></div>
+          </div>
+        </section>
+
+        <section id="ios" class="products-section fade-in-on-view">
+          <div class="container">
+            <h2>IOS</h2>
+            <div id="grid-ios" class="products-grid"></div>
+          </div>
+        </section>
+    </main>
+
+    <div id="checkout-modal" class="modal hidden" aria-hidden="true" role="dialog">
+      <div class="modal-backdrop" data-close="true"></div>
+      <div class="modal-content">
+        <button class="modal-close" data-close="true">×</button>
+        <h3>الدفع</h3>
+        <div id="checkout-product" class="checkout-product"></div>
+
+        <form id="payment-form" class="form">
+          <label>وسيلة الدفع</label>
+          <select id="payment-method" required>
+            <option value="vodafone_cash">فودافون كاش</option>
+            <option value="instapay">إنستاباي</option>
+            <option value="binance">بينانس</option>
+          </select>
+
+          <div class="transfer-info">
+            <p class="muted">أرسل المبلغ إلى الرقم الظاهر أدناه ثم أدخل بيانات التحويل.</p>
+            <div class="transfer-target">
+              <span>رقم التحويل:</span>
+              <strong id="transfer-number">—</strong>
             </div>
-        </div>
+          </div>
+
+          <label>الرقم المُرسل منه</label>
+          <input id="sender-number" type="text" placeholder="مثال: 010xxxxxxx" required />
+
+          <label>رقمك للتواصل</label>
+          <input id="contact-number" type="text" placeholder="مثال: واتساب / تليجرام" required />
+
+          <label>المبلغ المُرسل</label>
+          <input id="amount" type="number" min="1" step="0.01" required />
+
+          <button id="btn-complete-payment" type="submit" class="btn btn-primary">إتمام الدفع</button>
+          <div id="payment-status" class="status"></div>
+        </form>
+      </div>
     </div>
 
-    <!-- Payment Modal -->
-    <div id="paymentModal" class="auth-modal hidden">
-        <div class="auth-content">
-            <h3>إتمام الشراء</h3>
-            <div class="payment-methods">
-                <div class="payment-method active" data-method="vodafone">
-                    فودافون كاش
-                </div>
-                <div class="payment-method" data-method="instapay">
-                    انستاباي
-                </div>
-                <div class="payment-method" data-method="binance">
-                    بينانس
-                </div>
+    <div id="auth-modal" class="modal hidden" aria-hidden="true" role="dialog">
+      <div class="modal-backdrop" data-close="true"></div>
+      <div class="modal-content auth-content">
+        <button class="modal-close" data-close="true">×</button>
+        <h3>تسجيل الدخول / إنشاء حساب</h3>
+
+        <div class="auth-options">
+          <button id="btn-google" class="btn btn-google">الدخول عبر Google</button>
+          <div class="divider"><span>أو</span></div>
+          <form id="email-auth-form" class="form">
+            <label>البريد الإلكتروني</label>
+            <input id="email" type="email" required />
+            <label>كلمة المرور</label>
+            <input id="password" type="password" minlength="6" required />
+            <div class="row">
+              <button id="btn-email-login" type="button" class="btn btn-primary">تسجيل الدخول</button>
+              <button id="btn-email-signup" type="button" class="btn btn-ghost">إنشاء حساب</button>
             </div>
-            
-            <div id="paymentDetails">
-                <div class="info-box">
-                    <p>الرجاء التحويل إلى الرقم:</p>
-                    <h4>01200651813</h4>
-                </div>
-                
-                <div class="form-group">
-                    <label>رقمك الذي أرسلت منه الأموال:</label>
-                    <input type="tel" id="senderNumber" placeholder="مثال: 01200651813">
-                </div>
-                
-                <div class="form-group">
-                    <label>رقمك للتواصل:</label>
-                    <input type="tel" id="contactNumber" placeholder="للتواصل معك">
-                </div>
-                
-                <button class="btn btn-primary" id="confirmPayment">
-                    تأكيد الدفع
-                </button>
-            </div>
+            <button id="btn-reset" type="button" class="btn btn-link">نسيت كلمة المرور؟</button>
+            <div id="auth-status" class="status"></div>
+          </form>
         </div>
+      </div>
     </div>
 
-    <script>
-        // Firebase Configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyDlix7qhcXumRLOd9Z0-hoKQCzX90RCFiQ",
-            authDomain: "store-gh0st.firebaseapp.com",
-            projectId: "store-gh0st",
-            storageBucket: "store-gh0st.firebasestorage.app",
-            messagingSenderId: "617542014023",
-            appId: "1:617542014023:web:fadb67939faa10362f8d62",
-            measurementId: "G-BGNGCF2FV1"
-        };
+    <footer class="site-footer">
+      <div class="container">
+        <p>© <span id="year"></span> Panels Store. جميع الحقوق محفوظة.</p>
+      </div>
+    </footer>
 
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
+    <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore-compat.js"></script>
 
-        // Application State
-        let currentUser = null;
-        let userRole = 'user';
-        let products = [];
-        let cart = [];
-        let currentPaymentMethod = 'vodafone';
-
-        // Initialize App
-        document.addEventListener('DOMContentLoaded', function() {
-            initApp();
-        });
-
-        async function initApp() {
-            await initAuth();
-            setupEventListeners();
-            loadProducts();
-        }
-
-        // Authentication
-        async function initAuth() {
-            auth.onAuthStateChanged(async (user) => {
-                if (user) {
-                    currentUser = user;
-                    await loadUserData(user.uid);
-                    showUserMenu();
-                    showNotification(`مرحباً ${user.displayName}!`, 'success');
-                } else {
-                    showLoginButtons();
-                }
-            });
-        }
-
-        async function loadUserData(uid) {
-            try {
-                const userDoc = await db.collection('users').doc(uid).get();
-                if (userDoc.exists) {
-                    const userData = userDoc.data();
-                    userRole = userData.role || 'user';
-                    
-                    document.getElementById('userName').textContent = userData.name || user.displayName;
-                    
-                    if (userRole === 'admin') {
-                        document.getElementById('adminPanelBtn').classList.remove('hidden');
-                    }
-                }
-            } catch (error) {
-                console.error('Error loading user data:', error);
-            }
-        }
-
-        function showUserMenu() {
-            document.getElementById('loginButtons').classList.add('hidden');
-            document.getElementById('userMenu').classList.remove('hidden');
-        }
-
-        function showLoginButtons() {
-            document.getElementById('loginButtons').classList.remove('hidden');
-            document.getElementById('userMenu').classList.add('hidden');
-        }
-
-        async function loginWithGoogle() {
-            try {
-                const provider = new firebase.auth.GoogleAuthProvider();
-                await auth.signInWithPopup(provider);
-            } catch (error) {
-                showNotification('خطأ في الدخول: ' + error.message, 'error');
-            }
-        }
-
-        async function logout() {
-            try {
-                await auth.signOut();
-                showNotification('تم تسجيل الخروج', 'success');
-            } catch (error) {
-                showNotification('خطأ في التسجيل', 'error');
-            }
-        }
-
-        // Products
-        async function loadProducts() {
-            try {
-                const snapshot = await db.collection('products').where('active', '==', true).get();
-                products = [];
-                snapshot.forEach(doc => {
-                    products.push({ id: doc.id, ...doc.data() });
-                });
-                renderProducts();
-            } catch (error) {
-                console.error('Error loading products:', error);
-                loadSampleProducts();
-            }
-        }
-
-        function renderProducts() {
-            const grid = document.getElementById('productsGrid');
-            grid.innerHTML = '';
-
-            products.forEach(product => {
-                const productCard = document.createElement('div');
-                productCard.className = 'product-card';
-                productCard.innerHTML = `
-                    <div class="product-image">
-                        <i class="${product.icon || 'fas fa-ghost'}"></i>
-                    </div>
-                    <h3>${product.name}</h3>
-                    <p>${product.description}</p>
-                    <div class="product-price">$${product.price}</div>
-                    <button class="btn btn-primary" onclick="addToCart('${product.id}')">
-                        إضافة للسلة
-                    </button>
-                `;
-                grid.appendChild(productCard);
-            });
-        }
-
-        function loadSampleProducts() {
-            products = [
-                {
-                    id: '1',
-                    name: 'سكريبت فري فاير',
-                    description: 'سكريبت متطور للعبة فري فاير',
-                    price: 49.99,
-                    icon: 'fas fa-code'
-                },
-                {
-                    id: '2', 
-                    name: 'بانل إدارة',
-                    description: 'نظام إدارة متكامل',
-                    price: 99.99,
-                    icon: 'fas fa-cogs'
-                }
-            ];
-            renderProducts();
-        }
-
-        // Cart & Payment
-        function addToCart(productId) {
-            const product = products.find(p => p.id === productId);
-            if (product) {
-                cart.push(product);
-                updateCartCount();
-                showNotification('تمت الإضافة للسلة', 'success');
-            }
-        }
-
-        function updateCartCount() {
-            document.getElementById('cartCount').textContent = cart.length;
-        }
-
-        function setupEventListeners() {
-            // Google Login
-            document.getElementById('googleLoginBtn').addEventListener('click', loginWithGoogle);
-            
-            // Logout
-            document.getElementById('logoutBtn').addEventListener('click', logout);
-            
-            // Admin Panel
-            document.getElementById('adminPanelBtn').addEventListener('click', showAdminPanel);
-            document.getElementById('backToStore').addEventListener('click', showStore);
-            
-            // Payment Methods
-            document.querySelectorAll('.payment-method').forEach(method => {
-                method.addEventListener('click', function() {
-                    document.querySelectorAll('.payment-method').forEach(m => m.classList.remove('active'));
-                    this.classList.add('active');
-                    currentPaymentMethod = this.dataset.method;
-                });
-            });
-            
-            // Confirm Payment
-            document.getElementById('confirmPayment').addEventListener('click', processPayment);
-            
-            // Admin Navigation
-            document.querySelectorAll('[data-admin-section]').forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    showAdminSection(this.dataset.section);
-                });
-            });
-        }
-
-        function showAdminPanel() {
-            if (userRole !== 'admin') {
-                showNotification('ليس لديك صلاحية الدخول', 'error');
-                return;
-            }
-            
-            document.getElementById('storeInterface').style.display = 'none';
-            document.getElementById('adminInterface').classList.add('active');
-            loadAdminData();
-        }
-
-        function showStore() {
-            document.getElementById('storeInterface').style.display = 'block';
-            document.getElementById('adminInterface').classList.remove('active');
-        }
-
-        function showAdminSection(section) {
-            document.querySelectorAll('[data-admin-section]').forEach(div => {
-                div.classList.add('hidden');
-            });
-            document.querySelector(`[data-admin-section="${section}"]`).classList.remove('hidden');
-        }
-
-        async function loadAdminData() {
-            // تحميل بيانات الأدمن
-            updateAdminStats();
-            loadOrders();
-            calculateEarnings();
-        }
-
-        function updateAdminStats() {
-            document.getElementById('totalProducts').textContent = products.length;
-            document.getElementById('todayOrders').textContent = '5';
-            document.getElementById('totalSales').textContent = '$' + (products.reduce((sum, p) => sum + p.price, 0) * 0.3).toFixed(2);
-        }
-
-        async function loadOrders() {
-            // جلب الطلبات من Firebase
-            const ordersList = document.getElementById('ordersList');
-            ordersList.innerHTML = '<p>جاري تحميل الطلبات...</p>';
-            
-            // بيانات تجريبية
-            setTimeout(() => {
-                ordersList.innerHTML = `
-                    <div class="order-card">
-                        <h4>طلب #001</h4>
-                        <p>سكريبت فري فاير - $49.99</p>
-                        <p>طريقة الدفع: فودافون كاش</p>
-                        <p>رقم المحول: 01200651813</p>
-                        <div class="order-actions">
-                            <button class="btn btn-success">تم الدفع</button>
-                            <button class="btn btn-primary">تم التسليم</button>
-                        </div>
-                    </div>
-                `;
-            }, 1000);
-        }
-
-        async function calculateEarnings() {
-            // حساب الأرباح
-            document.getElementById('todayEarnings').textContent = '$245.50';
-            document.getElementById('weeklyEarnings').textContent = '$1,845.75';
-            document.getElementById('monthlyEarnings').textContent = '$7,892.30';
-            document.getElementById('totalEarnings').textContent = '$45,672.80';
-        }
-
-        async function processPayment() {
-            const senderNumber = document.getElementById('senderNumber').value;
-            const contactNumber = document.getElementById('contactNumber').value;
-            
-            if (!senderNumber || !contactNumber) {
-                showNotification('يرجى ملء جميع الحقول', 'error');
-                return;
-            }
-
-            try {
-                // حفظ الطلب في Firebase
-                const orderData = {
-                    userId: currentUser.uid,
-                    products: cart,
-                    total: cart.reduce((sum, item) => sum + item.price, 0),
-                    paymentMethod: currentPaymentMethod,
-                    senderNumber: senderNumber,
-                    contactNumber: contactNumber,
-                    status: 'pending',
-                    createdAt: new Date()
-                };
-
-                await db.collection('orders').add(orderData);
-                
-                showNotification('تم إرسال طلبك بنجاح!', 'success');
-                cart = [];
-                updateCartCount();
-                document.getElementById('paymentModal').classList.add('hidden');
-                
-            } catch (error) {
-                showNotification('خطأ في معالجة الطلب', 'error');
-            }
-        }
-
-        function showNotification(message, type) {
-            const notification = document.createElement('div');
-            notification.className = `notification ${type}`;
-            notification.textContent = message;
-            
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.remove();
-            }, 3000);
-        }
-
-        // Global functions
-        window.addToCart = addToCart;
-        window.loginWithGoogle = loginWithGoogle;
-        window.showAdminPanel = showAdminPanel;
-    </script>
-</body>
+    <script src="js/firebase.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/app.js"></script>
+  </body>
 </html>
